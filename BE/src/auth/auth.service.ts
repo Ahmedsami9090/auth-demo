@@ -13,8 +13,8 @@ export class AuthService {
         const user = await this.userService.findOne(email)
         if (!user || !await hashCompare(password, user?.password)) {
             throw new HttpException({
-                status: HttpStatus.NOT_FOUND,
-                error: 'Invalid credentials',
+                statusCode: HttpStatus.NOT_FOUND,
+                message: 'Invalid credentials',
             }, HttpStatus.FORBIDDEN, {
             });
         }
@@ -38,8 +38,8 @@ export class AuthService {
         const user = await this.userService.findById(payload.id)
         if (!user) {
             throw new HttpException({
-                status: HttpStatus.NOT_FOUND,
-                error: 'Invalid credentials',
+                statusCode: HttpStatus.NOT_FOUND,
+                message: 'Invalid credentials',
             }, HttpStatus.FORBIDDEN, {
             });
         }

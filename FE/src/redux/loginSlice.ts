@@ -1,24 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
+interface RejectedPayload {
+    message: string
+    statusCode: number
+}
 const initialState: {
-
     username: string | null,
     email: string | null,
-    error: {
-        message: string | null,
-        status: number | null
-    }
-    isLogged: boolean
+    isLogged : boolean
 } = {
-
     username: null,
     email: null,
-    error: {
-        message: null,
-        status: null
-    },
-    isLogged: false
+    isLogged : false
 }
 
 export const userLogin = createAsyncThunk('userLogin', async function (data: { email: string; password: string }, { rejectWithValue }) {
@@ -26,14 +20,10 @@ export const userLogin = createAsyncThunk('userLogin', async function (data: { e
         const res = await axios.post('http://localhost:3001/auth/login', data)
         return res.data
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            return rejectWithValue({
-                message: error.response?.data.error,
-                status: error.response?.data.status,
-            });
-        } else {
-            return rejectWithValue({ message: 'An unknown error occurred', status: 500 });
-        }
+        const axiosError = error as AxiosError
+        return rejectWithValue(
+            axiosError.response?.data
+        )
     }
 })
 
@@ -44,8 +34,8 @@ const loginSlice = createSlice({
         clearUserData: (state) => {
             localStorage.removeItem('token')
             state.email = null,
-                state.username = null,
-                state.isLogged = false
+            state.username = null
+            state.isLogged = false
         },
     },
     extraReducers(builder) {
@@ -56,11 +46,9 @@ const loginSlice = createSlice({
             state.isLogged = true
 
         }),
-            builder.addCase(userLogin.rejected, (state, action: PayloadAction<{ message: string, status: number }>) => {
-                console.log('rejected', action.payload);
-                state.error.message = action.payload.message
-                state.error.status = action.payload.status
-            })
+        builder.addCase(userLogin.rejected, (_, action) => {
+            throw new Error((action.payload as RejectedPayload).message || 'Unexpected error occurred')
+        })
     },
 
 })

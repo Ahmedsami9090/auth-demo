@@ -1,19 +1,18 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { userSignup } from '../../redux/signupSlice'
 import * as yup from 'yup'
 import Heading from '../Heading/Heading'
-import { reduxStore } from '../../redux/store'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { toast } from 'react-toastify'
 import SubmitBtn from '../SubmitBtn/SubmitBtn'
+import axios, { AxiosError } from 'axios'
+
+interface RejectedPayload {
+  message: string
+  statusCode: number
+}
 
 const Signup = () => {
-  const dispatch = useDispatch<typeof reduxStore.dispatch>()
-  const { error } = useSelector((state: ReturnType<typeof reduxStore.getState>) => {
-    return state.userSignupSlice
-  })
   const navigate = useNavigate()
   const [btnLoader, setBtnLoader] = useState<boolean>(false)
 
@@ -27,19 +26,16 @@ const Signup = () => {
     onSubmit: async (val) => {
       try {
         setBtnLoader(true)
-        const res = await dispatch(userSignup({
+        await axios.post('http://localhost:3001/users/signup', {
           name: val.name,
           password: val.password,
           email: val.email
-        }))
-        if ('error' in res) {
-          toast.error(error.message)
-        } else {
+        })
           toast.success(`signed up successfully`)
           navigate('/login')
-        }
       } catch (error) {
-        toast.error('Unexpected error occurred')
+        const axiosError = error as AxiosError
+        toast.error((axiosError.response?.data as RejectedPayload).message)
       } finally {
         setBtnLoader(false)
       }

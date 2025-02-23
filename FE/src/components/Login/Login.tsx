@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import Heading from '../Heading/Heading'
 import { reduxStore } from '../../redux/store'
 import { userLogin } from '../../redux/loginSlice'
@@ -12,9 +12,6 @@ import SubmitBtn from '../SubmitBtn/SubmitBtn'
 
 const Login = () => {
   const dispatch = useDispatch<typeof reduxStore.dispatch>()
-  const { error } = useSelector((state: ReturnType<typeof reduxStore.getState>) => {
-    return state.loginSlice
-  })
   const navigate = useNavigate()
   const [btnLoader, setBtnLoader] = useState<boolean>(false)
   const loginFormik = useFormik({
@@ -25,15 +22,11 @@ const Login = () => {
     onSubmit: async (val) => {
       try {
         setBtnLoader(true)
-        const res = await dispatch(userLogin(val))
-        if ('error' in res) {
-          toast.error(error.message)
-        } else {
-          toast.success(`Welcome back`)
-          navigate('/')
-        }
+        await dispatch(userLogin(val))
+        toast.success('Welcome Back')
+        navigate('/')
       } catch (error) {
-        toast.error('Unexpected error occurred')
+        toast.error(`${error}`)
       } finally {
         setBtnLoader(false)
       }

@@ -12,9 +12,8 @@ export class UsersController {
             return {msg : 'success'}
         } catch (error) {
             throw new HttpException({
-                status: HttpStatus.FORBIDDEN,
-                error: 'server error',
-                details : error.message
+                statusCode: HttpStatus.FORBIDDEN,
+                message: error.message,
             }, HttpStatus.FORBIDDEN, {
                 cause: error
             });

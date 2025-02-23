@@ -1,21 +1,22 @@
 import { useDispatch, useSelector } from "react-redux"
 import Heading from "../Heading/Heading"
 import { reduxStore } from "../../redux/store"
-import { useEffect } from "react"
+import { useLayoutEffect } from "react"
 import { getProfile } from "../../redux/getProfileSlice"
 import { toast } from "react-toastify"
 import avatar from '../../assets/avatar.svg'
 
 
 const Profile = () => {
-  const {error, email, role, id, name} = useSelector((state : ReturnType<typeof reduxStore.getState> )=>{
+  const {email, role, id, name} = useSelector((state : ReturnType<typeof reduxStore.getState> )=>{
     return state.getProfileSlice
   })
   const dispatch = useDispatch<typeof reduxStore.dispatch>()
-  useEffect(()=>{
-    dispatch(getProfile())
-    if(error.message){
-      toast.error(error.message)
+  useLayoutEffect(()=>{
+    try {
+      dispatch(getProfile())
+    } catch (error) {
+      toast.error(`${error}`)
     }
   },[])
   

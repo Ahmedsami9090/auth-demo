@@ -1,8 +1,9 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { reduxStore } from '../../redux/store'
 import { clearUserData } from '../../redux/loginSlice'
+import { toast } from 'react-toastify'
 
 
 interface UserDropMenuInt {
@@ -14,14 +15,13 @@ const UserDropMenu = (props: UserDropMenuInt) => {
         return state.loginSlice
     })
     const dispatch = useDispatch<typeof reduxStore.dispatch>()
-    const navigate = useNavigate()
     const handleClick = () => {
         props.setClicked(false)
     }
     const handleSignOut = () => {
         dispatch(clearUserData())
-        navigate('/')
         handleClick()
+        toast.success('Signed out successfully')
     }
     return (
         <div className="z-50 absolute md:w-1/12 w-full left-0 top-20 md:left-auto my-3  text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
